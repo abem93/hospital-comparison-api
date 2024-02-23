@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_23_005643) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_23_015429) do
   create_table "addresses", force: :cascade do |t|
     t.string "street_address"
     t.string "line2"
@@ -42,6 +42,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_23_005643) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "price"
   end
 
   create_table "procedure_costs", force: :cascade do |t|
