@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_20_001954) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_23_005643) do
   create_table "addresses", force: :cascade do |t|
     t.string "street_address"
     t.string "line2"
@@ -44,6 +44,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_20_001954) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "procedure_costs", force: :cascade do |t|
+    t.integer "procedure_id", null: false
+    t.integer "hospital_id", null: false
+    t.string "total_price"
+    t.integer "insurance_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hospital_id"], name: "index_procedure_costs_on_hospital_id"
+    t.index ["insurance_id"], name: "index_procedure_costs_on_insurance_id"
+    t.index ["procedure_id"], name: "index_procedure_costs_on_procedure_id"
+  end
+
   create_table "procedures", force: :cascade do |t|
     t.string "cpt_code"
     t.string "name"
@@ -63,4 +75,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_20_001954) do
   add_foreign_key "addresses", "hospitals"
   add_foreign_key "comparisons", "procedures"
   add_foreign_key "comparisons", "users"
+  add_foreign_key "procedure_costs", "hospitals"
+  add_foreign_key "procedure_costs", "insurances"
+  add_foreign_key "procedure_costs", "procedures"
 end

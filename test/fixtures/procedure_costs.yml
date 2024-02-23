@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  procedure: one
+  hospital: one
+  total_price: MyString
+  insurance: one
+
+two:
+  procedure: two
+  hospital: two
+  total_price: MyString
+  insurance: two
