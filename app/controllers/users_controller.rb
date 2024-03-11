@@ -1,12 +1,7 @@
 class UsersController < ApplicationController
-  # before_action :set_user, only:[:show, :update, :destroy]
-  # before_action :authenticate_request, only: [:index, :show, :update, :destroy]
+  before_action :set_user, only: [ :show, :update, :destroy]
+  before_action :authenticate_request, only: [ :show, :update, :destroy]
 
-  def index 
-    users = User.all
-
-    render json: users, status:200
-  end
 
   def show 
     render json: UserBlueprint.render(@user, view: :normal), status: :ok
@@ -38,20 +33,12 @@ class UsersController < ApplicationController
     end
   end
 
-  def posts_index
-    user = User.find(params[:user_id])
-    user_comparison = user.comparisons
-
-    render json: user_comparisons, status: :ok
-  end
-
   private
-
   def set_user
     @user = User.find(params[:id])
   end
 
   def user_params
-    params.permit(:username, :email, :first_name, :last_name, :password, :password_confirmation)
+    params.permit(:email, :zipcode, :password, :password_confirmation)
   end
 end
