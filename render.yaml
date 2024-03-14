@@ -1,8 +1,8 @@
 databases:
-  -name: CostoAPI
-  databaseName: CostoAPI
-  user: Costo-db
-  plan: free
+  - name: CostoAPI
+    databaseName: CostoAPI
+    user: Costo-db
+    plan: free
 
 services:
   - type: web
