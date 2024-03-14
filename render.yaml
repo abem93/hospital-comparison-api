@@ -1,12 +1,12 @@
 databases:
-  - name: CostoApi
-    databaseName: CostoApi
-    user: CostoApi
+  - name: CostoApp
+    databaseName: CostoApp
+    user: CostoApp
     plan: free
 
 services:
   - type: web
-    name: CostoApi
+    name: CostoApp
     runtime: ruby
     plan: free
     buildCommand: './bin/render-build.sh'
@@ -15,7 +15,7 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: CostoApi
+          name: CostoApp
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
