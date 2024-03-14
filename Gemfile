@@ -39,10 +39,11 @@ gem "blueprinter"
 gem "rack-cors"
 
 group :production do
-  gem 'pg'
+  gem "pg"
 end
 
 group :development, :test do
+  gem "sqlite3", "~> 1.4"
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
   gem "rspec-rails"
