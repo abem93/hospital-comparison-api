@@ -5,10 +5,7 @@ class HospitalBlueprint < Blueprinter::Base
 
   view :normal do
     fields :hospital_name
-  end
-
-  view :extended do
-    fields :hospital_name, :address
+    association :address, blueprint: AddressBlueprint, view: :normal
   end
 
 end

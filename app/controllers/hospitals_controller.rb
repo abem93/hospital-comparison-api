@@ -6,8 +6,8 @@ class HospitalsController < ApplicationController
   end
 
   def show 
-    @hospital = Hospital.includes(:address)
-    render json: HospitalBlueprint.render(@hospital, view: :extended), status: :ok
+    @hospital
+    render json: HospitalBlueprint.render(@hospital, view: :normal), status: :ok
   end
 
   private
