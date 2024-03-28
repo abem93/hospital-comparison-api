@@ -14,7 +14,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   end
 
   allow do
-    origins "https://health-comparison-client-m75wadgh5-abem93s-projects.vercel.app"
+    origins "https://costo.vercel.app"
     resource "*",
       headers: :any,
       methods: [:get, :post, :put, :patch, :delete, :options, :head]
