@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   scope '/' do
     post 'login', to: 'sessions#create'
   end
+  
  
   resources :users
   resources :procedures

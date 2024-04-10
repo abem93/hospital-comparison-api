@@ -2,8 +2,23 @@ class ProceduresController < ApplicationController
 
   before_action :set_procedure, only: [:show]
   def index
-    procedures = Procedure.all
-    render json: ProceduresBlueprint.render(procedures, view: :normal), status: :ok
+    find_by_name
+  
+    if @procedures.nil?
+      render json: { errors: "Procedure not found" }, status: :unprocessable_entity
+    else
+      render json: ProceduresBlueprint.render(@procedures, view: :normal), status: :ok
+    end
+  end
+
+
+  def find_by_name
+    search = params[:name]
+    if search.match?(/\A\d+\z/) # Check if the search term includes is a number
+      @procedures = Procedure.where("cpt_code LIKE ?", "%#{search}%")
+    else
+      @procedures = Procedure.where("name LIKE ?", "%#{search}%")
+    end
   end
 
   def show 
@@ -13,7 +28,7 @@ class ProceduresController < ApplicationController
 
   private
 
-  def set_procedure
-    @procedure = Procedure.find(params[:id])
-  end
+  # def set_procedures
+  #   @procedure = Procedure.find(params[:id])
+  # end
 end
