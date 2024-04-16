@@ -33,10 +33,16 @@ hospitals = [
 ] 
 hospitals.each do |hospital|
   ActiveRecord::Base.transaction do
-    hospital = Hospital.create(
+    hospital_data = Hospital.create(
       hospital_name: hospital[:hospital_name],
     )
-    hospital.address = Address.create(hospital[:address])
+    address = Address.new(hospital[:address])
+    address.street_address = hospital[:address][:street_address]
+    address.city = hospital[:address][:city]
+    address.state = hospital[:address][:state]
+    address.zipcode = hospital[:address][:zipcode]
+    address.save
+    hospital_data.address = address
   end
  
 end
