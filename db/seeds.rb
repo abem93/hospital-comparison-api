@@ -2,7 +2,44 @@ require 'csv'
 require 'json'
 
 self_pay = Insurance.new(name: 'Self Pay').save
-
+hospitals = [
+  {
+    hospital_name: 'CoxHealth Medical Center South', 
+    address:{  
+      street_address: "3801 S National Ave",
+      city: "Springfield",
+      state: "MO",
+      zipcode: "65807"
+    }
+  }, 
+  {
+    hospital_name: "Mercy Hospital Springfield",
+    address:{
+      street_address: "1235 E Cherokee St",
+      city: "Springfield",
+      state: "MO",
+      zipcode: "65804",
+    }
+  },
+  {
+    hospital_name: "Freeman Health System",
+    address:{
+      street_address: "1102 W 32nd St",
+      city: "Joplin",
+      state: "MO",
+      zipcode: "64804",
+    }
+  }
+] 
+hospitals.each do |hospital|
+  ActiveRecord::Base.transaction do
+    hospital = Hospital.create(
+      hospital_name: hospital[:hospital_name],
+    )
+    hospital.address = Address.create(hospital[:address])
+  end
+ 
+end
 
 cox_csv_file_path = File.expand_path('../../data/440577118_Cox_Medical_Centers_Springfield_standardcharges_PH203Nq.csv', __FILE__)
 
