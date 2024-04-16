@@ -2,7 +2,7 @@ require 'csv'
 require 'json'
 
 ActiveRecord::Base.transaction do
-  Adress.destroy_all
+  Address.destroy_all
   Hospital.all.each do |hospital|
     ProcedureCost.where(hospital_id: hospital.id).delete_all
   end
