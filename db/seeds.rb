@@ -24,30 +24,30 @@ CSV.foreach(freeman_csv_file_path, headers: true) do |row|
     #Display Data
     # freeman_data.push "Description: #{description}, CPT: #{row['Code']}, Self Pay Rate: #{row['Discounted cash price']}, Gross Price: #{row['Gross charge']}, Minimum Rate: #{row['De-identified min contracted rate']}, Maximum Rate: #{row['De-identified max contracted rate']}, Hospital:'Freeman'"
   
-    # ActiveRecord::Base.transaction do
-    #   # Create a new Procedure
-    #   procedure = Procedure.create(
-    #     name: description, 
-    #     cpt_code: cpt_code,
-    #   )
+    ActiveRecord::Base.transaction do
+      # Create a new Procedure
+      procedure = Procedure.create(
+        name: description, 
+        cpt_code: cpt_code,
+      )
     
-    #   # Find or create the insurance
-    #   self_pay = Insurance.find_or_create_by(name: 'Self Pay')
-    #   self_pay.price = row['Discounted cash price']
-    #   self_pay.save
+      # Find or create the insurance
+      self_pay = Insurance.find_or_create_by(name: 'Self Pay')
+      self_pay.price = row['Discounted cash price']
+      self_pay.save
     
-    #   # Find the hospital
-    #   hospital = Hospital.find_by(hospital_name: 'Freeman Health System')
+      # Find the hospital
+      hospital = Hospital.find_by(hospital_name: 'Freeman Health System')
     
     
-    #   # Create a new ProcedureCost
-    #   procedure_costs = ProcedureCost.new
-    #   procedure_costs.procedure = procedure
-    #   procedure_costs.hospital = hospital
-    #   procedure_costs.total_price = row['Gross charge']
-    #   procedure_costs.insurance = self_pay
-    #   procedure_costs.save
-    # end
+      # Create a new ProcedureCost
+      procedure_costs = ProcedureCost.new
+      procedure_costs.procedure = procedure
+      procedure_costs.hospital = hospital
+      procedure_costs.total_price = row['Gross charge']
+      procedure_costs.insurance = self_pay
+      procedure_costs.save
+    end
   end
 end
 
@@ -63,27 +63,27 @@ row_count = 0
     unless cox_data.any? { |data| data.include?("CPT/HCPCs: #{row['CPT/HCPCs']}") }
       cox_data.push("CPT/HCPCs: #{row['CPT/HCPCs']}, Self Pay Rate: #{row['Self Pay Rate ']}, Price Per Unit: #{row['Price Per Unit']}, Description: #{row['Description']}")
       
-      # ActiveRecord::Base.transaction do
-      #   # Find the Procedure
-      #   procedure = Procedure.find_by(cpt_code: row['CPT/HCPCs'])
+      ActiveRecord::Base.transaction do
+        # Find the Procedure
+        procedure = Procedure.find_by(cpt_code: row['CPT/HCPCs'])
         
-      #   # Find or create the insurance
-      #   self_pay = Insurance.find_or_create_by(name: 'Self Pay')
-      #   self_pay.price = row['Self Pay Rate ']
-      #   self_pay.save
+        # Find or create the insurance
+        self_pay = Insurance.find_or_create_by(name: 'Self Pay')
+        self_pay.price = row['Self Pay Rate ']
+        self_pay.save
       
-      #   # Find the hospital
-      #   hospital = Hospital.find_by(hospital_name: 'CoxHealth Medical Center South')
+        # Find the hospital
+        hospital = Hospital.find_by(hospital_name: 'CoxHealth Medical Center South')
       
       
-      #   # Create a new ProcedureCost
-      #   procedure_costs = ProcedureCost.new
-      #   procedure_costs.procedure = procedure
-      #   procedure_costs.hospital = hospital
-      #   procedure_costs.total_price = row['Price Per Unit']
-      #   procedure_costs.insurance = self_pay
-      #   procedure_costs.save
-      # end
+        # Create a new ProcedureCost
+        procedure_costs = ProcedureCost.new
+        procedure_costs.procedure = procedure
+        procedure_costs.hospital = hospital
+        procedure_costs.total_price = row['Price Per Unit']
+        procedure_costs.insurance = self_pay
+        procedure_costs.save
+      end
     end
   end
 end
@@ -115,27 +115,27 @@ begin
       freeman_cpt_codes.each do |freeman_code|
         if data['NriDrgCptCode'] == freeman_code && !mercy_data.any? { |mercy_data| mercy_data['NriDrgCptCode'] == data['NriDrgCptCode'] }
           mercy_data.push(data)
-          # ActiveRecord::Base.transaction do
-          #   # Find the Procedure
-          #   procedure = Procedure.find_by(cpt_code: data['NriDrgCptCode'])
+          ActiveRecord::Base.transaction do
+            # Find the Procedure
+            procedure = Procedure.find_by(cpt_code: data['NriDrgCptCode'])
             
-          #   # Find or create the insurance
-          #   self_pay = Insurance.find_or_create_by(name: 'Self Pay')
-          #   self_pay.price = data['SelfPay']
-          #   self_pay.save
+            # Find or create the insurance
+            self_pay = Insurance.find_or_create_by(name: 'Self Pay')
+            self_pay.price = data['SelfPay']
+            self_pay.save
           
-          #   # Find the hospital
-          #   hospital = Hospital.find_by(hospital_name: 'Mercy Hospital Springfield')
+            # Find the hospital
+            hospital = Hospital.find_by(hospital_name: 'Mercy Hospital Springfield')
           
           
-          #   # Create a new ProcedureCost
-          #   procedure_costs = ProcedureCost.new
-          #   procedure_costs.procedure = procedure
-          #   procedure_costs.hospital = hospital
-          #   procedure_costs.total_price = data['UnitCharge']
-          #   procedure_costs.insurance = self_pay
-          #   procedure_costs.save
-          # end
+            # Create a new ProcedureCost
+            procedure_costs = ProcedureCost.new
+            procedure_costs.procedure = procedure
+            procedure_costs.hospital = hospital
+            procedure_costs.total_price = data['UnitCharge']
+            procedure_costs.insurance = self_pay
+            procedure_costs.save
+          end
         end
       end
     end
