@@ -1,3 +1,3 @@
 set -o errexit
 bundle install
-bundle exec rake db:prepare
+bundle exec db:prepare
