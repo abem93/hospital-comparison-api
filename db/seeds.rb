@@ -11,6 +11,7 @@ freeman_csv_file_path = File.expand_path('../../data/431704371_Freeman-Health-Sy
 mercy_jsonfile_path = File.expand_path('../../data/440552485_mercyhospitalspringfield_standardcharges.json', __FILE__)
 
 
+
 row_count= 0
 freeman_data = []
 CSV.foreach(freeman_csv_file_path, headers: true) do |row|

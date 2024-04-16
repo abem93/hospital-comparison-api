@@ -1,3 +1,3 @@
 set -o errexit
 bundle install
-bin/rails db:prepare
+bundle exec rake db:setup
