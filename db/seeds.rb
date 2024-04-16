@@ -1,17 +1,11 @@
 require 'csv'
 require 'json'
 
-ActiveRecord::Base.transaction do
-  Address.destroy_all
-  Hospital.all.each do |hospital|
-    ProcedureCost.where(hospital_id: hospital.id).delete_all
-  end
-  
-  # Now you can delete all hospitals
-  Hospital.destroy_all
-end
 
-self_pay = Insurance.new(name: 'Self Pay').save
+
+self_pay = Insurance.create(name: 'Self Pay')
+
+
 hospitals = [
   {
     hospital_name: 'CoxHealth Medical Center South', 
