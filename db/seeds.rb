@@ -2,7 +2,8 @@ require 'csv'
 require 'json'
 
 ActiveRecord::Base.transaction do
-  Hospital.destroy_all
+  Address.delete_all
+  Hospital.delete_all
 end
 
 self_pay = Insurance.new(name: 'Self Pay').save
