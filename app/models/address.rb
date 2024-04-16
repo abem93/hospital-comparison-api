@@ -5,4 +5,5 @@ class Address < ApplicationRecord
   validates :zipcode, presence:true
 
   belongs_to :hospital
+  validates :hospital, presence: true
 end

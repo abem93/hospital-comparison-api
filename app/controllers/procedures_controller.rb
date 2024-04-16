@@ -12,6 +12,14 @@ class ProceduresController < ApplicationController
   end
 
 
+  
+
+  def show 
+    render json: ProceduresBlueprint.render(@procedure, view: :extended), status: :ok
+  end
+  
+
+private
   def find_by_name
     search = params[:name]
     if search.match?(/\A\d+\z/) # Check if the search term includes is a number
@@ -21,12 +29,12 @@ class ProceduresController < ApplicationController
     end
   end
 
-  def show 
-    render json: ProceduresBlueprint.render(@procedure, view: :extended), status: :ok
+  def hospitals
+    @procedure = Procedure.find(params[:id])
+    @hospitals = @procedure.procedure_costs.map(&:hospital)
+    render json: @hospitals, status: :ok
   end
   
-
-  private
 
   # def set_procedures
   #   @procedure = Procedure.find(params[:id])
