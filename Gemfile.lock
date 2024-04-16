@@ -230,6 +230,7 @@ DEPENDENCIES
   bcrypt
   blueprinter
   bootsnap
+  bundler
   debug
   factory_bot_rails
   faker
