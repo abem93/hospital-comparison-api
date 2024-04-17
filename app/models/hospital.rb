@@ -4,7 +4,6 @@ class Hospital < ApplicationRecord
   has_one :address
 
   has_many :procedure_costs
-  has_many :insurances, through: :procedure_costs
   has_many :procedures, through: :procedure_costs
 
 end

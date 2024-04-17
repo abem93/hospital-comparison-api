@@ -3,8 +3,8 @@ require 'json'
 
 
 
-self_pay = Insurance.create(name: 'Self Pay')
-
+self_pay = Insurance.new(name: 'Self Pay')
+self_pay.save
 
 hospitals = [
   {
@@ -37,16 +37,18 @@ hospitals = [
 ] 
 hospitals.each do |hospital|
   ActiveRecord::Base.transaction do
-    hospital_data = Hospital.create(
+    hospital_data = Hospital.find_or_initialize_by(
       hospital_name: hospital[:hospital_name],
     )
-    address = Address.new(hospital[:address])
+    hospital_data.save
+    address = Address.find_or_initialize_by(hospital[:address])
     address.street_address = hospital[:address][:street_address]
     address.city = hospital[:address][:city]
     address.state = hospital[:address][:state]
     address.zipcode = hospital[:address][:zipcode]
     address.save
     hospital_data.address = address
+    hospital_data.save
   end
  
 end
@@ -74,27 +76,27 @@ CSV.foreach(freeman_csv_file_path, headers: true) do |row|
   
     ActiveRecord::Base.transaction do
       # Create a new Procedure
-      procedure = Procedure.create(
-        name: description, 
-        cpt_code: cpt_code,
-      )
+      procedure = Procedure.find_or_initialize_by(cpt_code: cpt_code)
+      procedure.name = description
+      procedure.save
     
       # Find or create the insurance
       self_pay = Insurance.find_or_create_by(name: 'Self Pay')
-      self_pay.price = row['Discounted cash price']
-      self_pay.save
     
       # Find the hospital
       hospital = Hospital.find_by(hospital_name: 'Freeman Health System')
     
     
       # Create a new ProcedureCost
-      procedure_costs = ProcedureCost.new
-      procedure_costs.procedure = procedure
-      procedure_costs.hospital = hospital
-      procedure_costs.total_price = row['Gross charge']
-      procedure_costs.insurance = self_pay
-      procedure_costs.save
+      procedure_costs = ProcedureCost.create(procedure_id: procedure.id, hospital_id: hospital.id, total_price: row['Gross charge'])
+      
+
+      # Create an entry in the join table
+      insurance_procedure_cost = InsuranceProcedureCost.new(insurance_id: self_pay.id, price: row['Discounted cash price'].to_f, procedure_cost_id: procedure_costs.id)
+      insurance_procedure_cost.procedure_cost = procedure_costs
+      insurance_procedure_cost.save!
+      procedure_costs.save!
+      puts "InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
     end
   end
 end
@@ -102,7 +104,7 @@ end
 
 cox_data = []
 freeman_cpt_codes = freeman_data.map { |data| data[1] }
-row_count = 0
+
  CSV.foreach(cox_csv_file_path, headers: true, encoding: 'ISO-8859-1') do |row|
 
   # Check if Cox data contains the CPT code from freeman data
@@ -116,21 +118,21 @@ row_count = 0
         procedure = Procedure.find_by(cpt_code: row['CPT/HCPCs'])
         
         # Find or create the insurance
-        self_pay = Insurance.find_or_create_by(name: 'Self Pay')
-        self_pay.price = row['Self Pay Rate ']
-        self_pay.save
-      
+        self_pay = Insurance.find_by(name: 'Self Pay')
+
         # Find the hospital
         hospital = Hospital.find_by(hospital_name: 'CoxHealth Medical Center South')
       
       
         # Create a new ProcedureCost
-        procedure_costs = ProcedureCost.new
-        procedure_costs.procedure = procedure
-        procedure_costs.hospital = hospital
-        procedure_costs.total_price = row['Price Per Unit']
-        procedure_costs.insurance = self_pay
-        procedure_costs.save
+        procedure_costs = ProcedureCost.create(procedure_id: procedure.id, hospital_id: hospital.id, total_price: row['Price Per Unit'])
+
+        # Create an entry in the join table
+        insurance_procedure_cost = InsuranceProcedureCost.new(insurance_id: self_pay.id, price: row['Self Pay Rate '].to_f, procedure_cost_id: procedure_costs.id)
+        insurance_procedure_cost.procedure_cost = procedure_costs
+        insurance_procedure_cost.save!
+        procedure_costs.save!
+        puts "InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
       end
     end
   end
@@ -158,55 +160,58 @@ begin
     end
 
     #Check if mercy data contains the CPT code from freeman data
-
     price_data.each do |data|
-      freeman_cpt_codes.each do |freeman_code|
-        if data['NriDrgCptCode'] == freeman_code && !mercy_data.any? { |mercy_data| mercy_data['NriDrgCptCode'] == data['NriDrgCptCode'] }
-          mercy_data.push(data)
+        if data['NriDrgCptCode'] && freeman_cpt_codes.include?(data['NriDrgCptCode'])
+          
+          total_price = data['UnitCharge'].gsub('$', '').to_f
+          self_pay_rate = data['SelfPay'].gsub('$', '').to_f
+
+          
           ActiveRecord::Base.transaction do
             # Find the Procedure
             procedure = Procedure.find_by(cpt_code: data['NriDrgCptCode'])
             
             # Find or create the insurance
-            self_pay = Insurance.find_or_create_by(name: 'Self Pay')
-            self_pay.price = data['SelfPay']
-            self_pay.save
+            self_pay = Insurance.find_by(name: 'Self Pay')
           
             # Find the hospital
             hospital = Hospital.find_by(hospital_name: 'Mercy Hospital Springfield')
-          
-          
+
+            begin
+              ActiveRecord::Base.transaction do
+                procedure_costs = ProcedureCost.create(procedure_id: procedure.id, hospital_id: hospital.id, total_price: total_price)
+
+                # Check if the ProcedureCost was successfully created
+                 if procedure_costs.persisted?
+                   # Create an entry in the join table
+                   begin
+                     ActiveRecord::Base.transaction do
+                       insurance_procedure_cost = InsuranceProcedureCost.new(insurance_id: self_pay.id, price: self_pay_rate, procedure_cost_id: procedure_costs.id)
+                       # Save the InsuranceProcedureCost record
+                       insurance_procedure_cost.procedure_cost = procedure_costs
+                       insurance_procedure_cost.save!
+                       procedure_costs.save!
+                      
+                       puts "InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
+                      end
+                      rescue => e
+                     # Log or inspect the error message
+                     puts "An error occurred while creating InsuranceProcedureCost records: #{e.message}"
+                   end
+                   
+                 else
+                   puts "ProcedureCost creation failed."
+                 end
+               end
+              end
+            rescue => e
+              # Log or inspect the error message
+              puts "An error occurred while creating InsuranceProcedureCost records: #{e.message}"
+            end
             # Create a new ProcedureCost
-            procedure_costs = ProcedureCost.new
-            procedure_costs.procedure = procedure
-            procedure_costs.hospital = hospital
-            procedure_costs.total_price = data['UnitCharge']
-            procedure_costs.insurance = self_pay
-            procedure_costs.save
-          end
+
+
         end
-      end
     end
   end
-end
-
-
-
-
-unmatched_freeman_data = freeman_data.reject do |description, cpt_code|
-  cox_data.any? { |data| data.include?("CPT/HCPCs: #{cpt_code}") } ||
-  mercy_data.any? { |data| data['NriDrgCptCode'] == cpt_code }
-end
-
-unmatched_freeman_data.each do |data|
-    ActiveRecord::Base.transaction do
-      # Find the Procedure
-      procedure = Procedure.find_by(cpt_code: data[1])
-      
-      # Delete the related ProcedureCost records
-      procedure.procedure_costs.destroy_all if procedure.present?
-      
-      # Delete the unused Procedure
-      procedure.destroy if procedure
-    end
 end

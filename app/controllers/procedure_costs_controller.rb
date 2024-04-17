@@ -1,6 +1,10 @@
 class ProcedureCostsController < ApplicationController
   
-  before_action :set_procedure, only: [:show]
+  before_action :set_procedure, only: [:index, :show]
+
+  def index
+    render json: ProcedureCostBlueprint.render(@procedure, view: :normal), status: :ok
+  end
 
   def show 
     render json: ProceduresBlueprint.render(@procedure, view: :normal), status: :ok
@@ -10,6 +14,7 @@ class ProcedureCostsController < ApplicationController
   private
 
   def set_procedure
-    @procedure = Procedure_costs.find(params[:id])
+    @procedure = Procedure.find(params[:id])
+    @procedure = @procedure.procedure_costs
   end
 end

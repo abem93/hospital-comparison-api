@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_10_185710) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_17_143001) do
   create_table "addresses", force: :cascade do |t|
     t.string "street_address"
     t.string "line2"
@@ -38,22 +38,29 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_10_185710) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "insurance_procedure_costs", force: :cascade do |t|
+    t.integer "insurance_id", null: false
+    t.integer "procedure_cost_id", null: false
+    t.decimal "price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["insurance_id"], name: "index_insurance_procedure_costs_on_insurance_id"
+    t.index ["procedure_cost_id"], name: "index_insurance_procedure_costs_on_procedure_cost_id"
+  end
+
   create_table "insurances", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.float "price"
   end
 
   create_table "procedure_costs", force: :cascade do |t|
     t.integer "procedure_id", null: false
     t.integer "hospital_id", null: false
-    t.string "total_price"
-    t.integer "insurance_id", null: false
+    t.decimal "total_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hospital_id"], name: "index_procedure_costs_on_hospital_id"
-    t.index ["insurance_id"], name: "index_procedure_costs_on_insurance_id"
     t.index ["procedure_id"], name: "index_procedure_costs_on_procedure_id"
   end
 
@@ -76,7 +83,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_10_185710) do
   add_foreign_key "addresses", "hospitals"
   add_foreign_key "comparisons", "procedures"
   add_foreign_key "comparisons", "users"
+  add_foreign_key "insurance_procedure_costs", "insurances"
+  add_foreign_key "insurance_procedure_costs", "procedure_costs"
   add_foreign_key "procedure_costs", "hospitals"
-  add_foreign_key "procedure_costs", "insurances"
   add_foreign_key "procedure_costs", "procedures"
 end

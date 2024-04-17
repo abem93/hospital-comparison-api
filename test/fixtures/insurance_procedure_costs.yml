@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  insurance: one
+  procedure_cost: one
+  price: 9.99
+
+two:
+  insurance: two
+  procedure_cost: two
+  price: 9.99

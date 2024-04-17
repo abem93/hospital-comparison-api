@@ -1,6 +1,4 @@
 class ProceduresController < ApplicationController
-
-  before_action :set_procedure, only: [:show]
   def index
     find_by_name
   
@@ -10,9 +8,6 @@ class ProceduresController < ApplicationController
       render json: ProceduresBlueprint.render(@procedures, view: :normal), status: :ok
     end
   end
-
-
-  
 
   def show 
     render json: ProceduresBlueprint.render(@procedure, view: :extended), status: :ok
@@ -29,14 +24,4 @@ private
     end
   end
 
-  def hospitals
-    @procedure = Procedure.find(params[:id])
-    @hospitals = @procedure.procedure_costs.map(&:hospital)
-    render json: @hospitals, status: :ok
-  end
-  
-
-  # def set_procedures
-  #   @procedure = Procedure.find(params[:id])
-  # end
 end
