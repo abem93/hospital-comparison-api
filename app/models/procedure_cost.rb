@@ -3,7 +3,7 @@ class ProcedureCost < ApplicationRecord
 
   belongs_to :procedure
   belongs_to :hospital
-  has_many :insurance_procedure_costs
+  has_many :insurance_procedure_costs, dependent: :destroy
   has_many :insurances, through: :insurance_procedure_costs
 
   def to_s

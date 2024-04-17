@@ -6,8 +6,4 @@ class InsuranceBlueprint < Blueprinter::Base
   view :normal do
     fields :name
   end
-
-  view :extended do
-    fields :name, :price
-  end
 end

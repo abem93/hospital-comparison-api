@@ -8,7 +8,7 @@ class ProcedureCostBlueprint < Blueprinter::Base
 
     association :hospital, blueprint: HospitalBlueprint, view: :normal
     association :procedure, blueprint: ProceduresBlueprint, view: :normal
-    association :insurance, blueprint: InsuranceBlueprint, view: :extended
+   
   end
 
  

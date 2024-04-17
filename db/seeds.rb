@@ -162,7 +162,7 @@ begin
     #Check if mercy data contains the CPT code from freeman data
     price_data.each do |data|
         if data['NriDrgCptCode'] && freeman_cpt_codes.include?(data['NriDrgCptCode'])
-          
+          mercy_data.push(data)
           total_price = data['UnitCharge'].gsub('$', '').to_f
           self_pay_rate = data['SelfPay'].gsub('$', '').to_f
 
@@ -213,5 +213,33 @@ begin
 
         end
     end
+  end
+end
+
+unmatched_freeman_data = freeman_data.reject do |description, cpt_code|
+  cox_data.any? { |data| data.include?("CPT/HCPCs: #{cpt_code}") } ||
+  mercy_data.any? { |data| data['NriDrgCptCode'] == cpt_code }
+end
+puts "Unmatched Procedures: #{unmatched_freeman_data}"
+unmatched_freeman_data.each do |data|
+  begin
+    ActiveRecord::Base.transaction do
+      # Find the Procedure
+      procedure = Procedure.find_by(cpt_code: data[1])
+      
+      # Delete the associated InsuranceProcedureCosts records
+   
+
+      # Delete the related ProcedureCost records
+      procedure.procedure_costs.destroy_all if procedure.present?
+      
+      # Delete the unused Procedure
+      procedure.destroy if procedure
+
+      puts "Procedure record deleted successfully. CPT Code: #{data[1]}"
+    end
+  rescue => e
+  # Log or inspect the error message
+  puts "An error occurred while deleting Procedure records: #{e.message}"
   end
 end
