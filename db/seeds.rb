@@ -96,7 +96,7 @@ CSV.foreach(freeman_csv_file_path, headers: true) do |row|
       insurance_procedure_cost.procedure_cost = procedure_costs
       insurance_procedure_cost.save!
       procedure_costs.save!
-      puts "InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
+      puts "Freeman InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
     end
   end
 end
@@ -132,7 +132,7 @@ freeman_cpt_codes = freeman_data.map { |data| data[1] }
         insurance_procedure_cost.procedure_cost = procedure_costs
         insurance_procedure_cost.save!
         procedure_costs.save!
-        puts "InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
+        puts "Cox InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
       end
     end
   end
@@ -192,7 +192,6 @@ begin
                        procedure_costs.save!
                       
                        puts "Mercy InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
-                      puts self_pay_rate
                       end
                       rescue => e
                      # Log or inspect the error message
