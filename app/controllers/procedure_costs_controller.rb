@@ -3,11 +3,12 @@ class ProcedureCostsController < ApplicationController
   before_action :set_procedure, only: [:index, :show]
 
   def index
-    render json: ProcedureCostBlueprint.render(@procedure, view: :normal), status: :ok
+    @procedure_costs = @procedure.procedure_costs.includes(:insurance_procedure_costs => :insurance)
+    render json: ProcedureCostBlueprint.render(@procedure_costs, view: :normal, root: :procedure_costs, insurance_procedure_costs: { include: { insurance: { except: [:created_at, :updated_at]} } }), status: :ok
   end
 
   def show 
-    render json: ProceduresBlueprint.render(@procedure, view: :normal), status: :ok
+    render json: ProcedureCostBlueprint.render(@procedure, view: :normal), status: :ok
   end
   
 
@@ -15,6 +16,5 @@ class ProcedureCostsController < ApplicationController
 
   def set_procedure
     @procedure = Procedure.find(params[:id])
-    @procedure = @procedure.procedure_costs
   end
 end

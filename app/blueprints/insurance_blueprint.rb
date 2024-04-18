@@ -2,7 +2,8 @@
 
 class InsuranceBlueprint < Blueprinter::Base
   identifier :id
-
+  fields :name
+  
   view :normal do
     fields :name
   end

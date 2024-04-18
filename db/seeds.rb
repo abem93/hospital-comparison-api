@@ -163,9 +163,8 @@ begin
     price_data.each do |data|
         if data['NriDrgCptCode'] && freeman_cpt_codes.include?(data['NriDrgCptCode'])
           mercy_data.push(data)
-          total_price = data['UnitCharge'].gsub('$', '').to_f
-          self_pay_rate = data['SelfPay'].gsub('$', '').to_f
-
+          total_price = data['UnitCharge'].gsub(/[$,]/, '').to_f
+          self_pay_rate = data['SelfPay'].gsub(/[$,]/, '').to_f
           
           ActiveRecord::Base.transaction do
             # Find the Procedure
@@ -192,7 +191,8 @@ begin
                        insurance_procedure_cost.save!
                        procedure_costs.save!
                       
-                       puts "InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
+                       puts "Mercy InsuranceProcedureCost record created successfully. ID: #{insurance_procedure_cost.id}"
+                      puts self_pay_rate
                       end
                       rescue => e
                      # Log or inspect the error message
@@ -220,7 +220,6 @@ unmatched_freeman_data = freeman_data.reject do |description, cpt_code|
   cox_data.any? { |data| data.include?("CPT/HCPCs: #{cpt_code}") } ||
   mercy_data.any? { |data| data['NriDrgCptCode'] == cpt_code }
 end
-puts "Unmatched Procedures: #{unmatched_freeman_data}"
 unmatched_freeman_data.each do |data|
   begin
     ActiveRecord::Base.transaction do
@@ -236,7 +235,7 @@ unmatched_freeman_data.each do |data|
       # Delete the unused Procedure
       procedure.destroy if procedure
 
-      puts "Procedure record deleted successfully. CPT Code: #{data[1]}"
+      # puts "Procedure record deleted successfully. CPT Code: #{data[1]}"
     end
   rescue => e
   # Log or inspect the error message

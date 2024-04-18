@@ -4,13 +4,13 @@ class ProcedureCostBlueprint < Blueprinter::Base
   identifier :id
 
   view :normal do
-    fields  :total_price
+    fields :total_price
 
     association :hospital, blueprint: HospitalBlueprint, view: :normal
     association :procedure, blueprint: ProceduresBlueprint, view: :normal
-   
+    association :insurance_procedure_costs, blueprint: InsuranceProcedureCostBlueprint do |procedure_cost|
+      procedure_cost.insurance_procedure_costs
+    end
   end
+end  
 
- 
-  
-end
